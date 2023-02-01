@@ -1,13 +1,14 @@
-version: "2"
+version: "3"
 services:
   influxdb:
     container_name: influxdb
-    image: influxdb:latest
+    image: influxdb:2.6.1
+    env_file:
+      - ./influxdb2.env
     ports:
-      - "8083:8083"
       - "8086:8086"
     volumes:
-      - ./vols/:/var/lib/influxdb
+      - influxdbv2:/var/lib/influxdb2:rw
     restart: always
 
   grafana:
@@ -15,18 +16,18 @@ services:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
-    links:
-      - influxdb
     restart: always
 
   telegraf:
     container_name: telegraf
-    image: telegraf:latest 
+    image: telegraf:latest
+    env_file:
+      - ./influxdb2.env
     ports:
-      - "57000:57000"   
-    links:
-      - influxdb
+      - "57000:57000"
     volumes:
       - ./conf/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-      - /var/run/docker.sock:/var/run/docker.sock
     restart: always
+
+volumes:
+  influxd2:
