@@ -4,7 +4,7 @@ services:
     container_name: influxdb
     image: influxdb:2.6.1
     env_file:
-      - ./influxdb2.env
+      - ./.env
     ports:
       - "8086:8086"
     volumes:
@@ -14,19 +14,31 @@ services:
   grafana:
     container_name: grafana
     image: grafana/grafana:latest
+    env_file:
+      - ./.env
+    links:
+      - influxdb
     ports:
       - "3000:3000"
+    volumes:
+      - ./conf/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - influxdb
     restart: always
 
   telegraf:
     container_name: telegraf
     image: telegraf:latest
     env_file:
-      - ./influxdb2.env
+      - ./.env
+    links:
+      - influxdb
     ports:
       - "57000:57000"
     volumes:
       - ./conf/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - influxdb
     restart: always
 
 volumes:
